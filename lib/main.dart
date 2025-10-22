@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
       // Define o tema principal com a cor de fundo vibrante
       theme: ThemeData(
         // Cor de fundo ciano/turquesa vibrante, baseada na imagem.
-        scaffoldBackgroundColor: const Color(0xFF00E5FF),
+        scaffoldBackgroundColor: const Color.fromRGBO(0, 206, 209, 1),
         // Desativa a sombra padrão para um visual mais clean
         appBarTheme: const AppBarTheme(elevation: 0, color: Colors.transparent),
         useMaterial3: false, 
@@ -75,7 +75,7 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF00E5FF),
+      backgroundColor: const Color.fromRGBO(0, 206, 209, 1),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(32.0),
@@ -205,7 +205,7 @@ class RegisterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF00E5FF),
+      backgroundColor: const Color.fromRGBO(0, 206, 209, 1),
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.black), 
       ),
@@ -311,7 +311,7 @@ class ForgotPasswordPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF00E5FF),
+      backgroundColor: const Color.fromRGBO(0, 206, 209, 1),
       appBar: AppBar(
         // Inclui a flecha para voltar (4. flecha para voltar)
         iconTheme: const IconThemeData(color: Colors.black),
@@ -459,7 +459,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF00E5FF),
+      backgroundColor: const Color.fromRGBO(0, 206, 209, 1),
       appBar: AppBar(
         title: const Text(
           'Meu Controle de Gastos', // 1. Título
@@ -585,7 +585,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF00E5FF),
+      backgroundColor: const Color.fromRGBO(0, 206, 209, 1),
       appBar: AppBar(
         // 7. Flecha canto superior esquerdo para voltar a tela principal
         iconTheme: const IconThemeData(color: Colors.black),
