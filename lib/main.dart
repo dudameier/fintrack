@@ -83,28 +83,31 @@ class LoginPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               // 1. Nome do App
-              const SizedBox(height: 40),
-              const Text(
-                'MEU CONTROLE DE GASTOS',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                  letterSpacing: 1.5,
+              const SizedBox(height: 135),
+              Center(
+                child: Text(
+                  'FinTrack',
+                  style: TextStyle(
+                    fontSize: 38,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                    letterSpacing: 1.5,
+                  ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 65),
+
 
               // Título "Login"
               const Text(
                 'Login',
                 style: TextStyle(
-                  fontSize: 38,
+                  fontSize: 26,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 25),
 
               // 2. Campo - E-mail
               TextFormField(
@@ -170,7 +173,7 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 5),
 
               // 6. Botão de esquecimento de senha
               Center(
@@ -215,15 +218,16 @@ class RegisterPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              const SizedBox(height: 150), 
               const Text(
-                'Cadastre-se', // 1. Escrita Cadastre-se
+                'Cadastre-se',
                 style: TextStyle(
                   fontSize: 38,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 20),
 
               // 2. Campo - E-mail
               TextFormField(
@@ -322,6 +326,7 @@ class ForgotPasswordPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              const SizedBox(height: 150),
               const Text(
                 'Recuperar Senha',
                 style: TextStyle(
