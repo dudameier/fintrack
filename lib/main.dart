@@ -424,12 +424,10 @@ class HomePage extends StatelessWidget {
     {'description': 'Venda de Item', 'value': 250.00, 'date': '19/10/2025', 'isExpense': false},
   ];
 
-  // Calcula o saldo atual
   double get currentBalance {
     return transactions.fold(0.0, (sum, item) => sum + (item['isExpense'] ? -item['value'] : item['value']));
   }
 
-  // Diálogo para Sair da Conta (Logout)
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -440,15 +438,14 @@ class HomePage extends StatelessWidget {
           content: const Text('Tem certeza que deseja sair?'),
           actions: <Widget>[
             TextButton(
-              onPressed: () => Navigator.of(context).pop(), // Fechar
+              onPressed: () => Navigator.of(context).pop(),
               child: const Text('Cancelar', style: TextStyle(color: Colors.black54)),
             ),
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Fecha o diálogo
-                // Redireciona para a tela de Login e remove todas as rotas anteriores
+                Navigator.of(context).pop();
                 Navigator.of(context).pushNamedAndRemoveUntil(
-                  MyApp.loginRoute, 
+                  '/login',
                   (Route<dynamic> route) => false,
                 );
               },
@@ -464,111 +461,169 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(0, 206, 209, 1),
-      appBar: AppBar(
-        title: const Text(
-          'Meu Controle de Gastos', // 1. Título
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.transparent,
-        automaticallyImplyLeading: false, // Remove a seta de voltar (pois é a tela principal)
-        actions: [
-          // 4. Ícone de pessoa no canto superior direito (Abre menu de sair)
-          IconButton(
-            icon: const Icon(Icons.person, color: Colors.black),
-            onPressed: () {
-              _showLogoutDialog(context);
-            },
-          ),
-          const SizedBox(width: 10),
-        ],
-      ),
+      // Cor geral da tela
+      backgroundColor: const Color(0xFF00CED1),
+
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 2. Total do saldo atual
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-            child: Card(
-              color: Colors.white,
-              elevation: 5,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Row(
+          // ==========================
+          // 🔹 CABEÇALHO SUPERIOR
+          // ==========================
+          Container(
+            width: double.infinity,
+            color: const Color.fromRGBO(0, 206, 209, 1), // Cor do cabeçalho — altere aqui
+            padding: const EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Espaço para mover o título para cima/baixo
+                const SizedBox(height: 0), // <-- ajuste aqui livremente
+
+                // 🔹 Linha superior com título e ícone
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'Saldo Atual:',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.black54),
-                    ),
-                    Text(
-                      'R\$ ${currentBalance.toStringAsFixed(2).replaceAll('.', ',')}',
+                      'FinTrack',
                       style: TextStyle(
-                        fontSize: 28,
+                        color: Colors.black,
                         fontWeight: FontWeight.bold,
-                        color: currentBalance >= 0 ? Colors.green[700] : Colors.red[700],
+                        fontSize: 24,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () => _showLogoutDialog(context),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: const BoxDecoration(
+                          color: Colors.black12,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.person, color: Colors.black),
                       ),
                     ),
                   ],
                 ),
-              ),
+
+                // Espaço entre o título e a linha
+                const SizedBox(height: 10),
+              ],
             ),
           ),
-          
-          // 3. Consulta das transações
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-            child: Text(
-              'Transações Recentes:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
-            ),
-          ),
+
+          // ==========================
+          // 🔹 CONTEÚDO INFERIOR
+          // ==========================
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
-              itemCount: transactions.length,
-              itemBuilder: (context, index) {
-                final transaction = transactions[index];
-                final isExpense = transaction['isExpense'] as bool;
-                
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 10),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-                  child: ListTile(
-                    leading: Icon(
-                      isExpense ? Icons.arrow_downward : Icons.arrow_upward,
-                      color: isExpense ? Colors.red : Colors.green,
-                    ),
-                    title: Text(transaction['description'].toString()),
-                    subtitle: Text('Data: ${transaction['date']}'),
-                    trailing: Text(
-                      'R\$ ${isExpense ? '-' : ''}${transaction['value'].toStringAsFixed(2).replaceAll('.', ',')}',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: isExpense ? Colors.red : Colors.green,
+            child: Container(
+              color: const Color.fromARGB(212, 113, 250, 254), // 🔹 Cor da parte inferior
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Espaço entre cabeçalho e saldo
+                  const SizedBox(height: 20),
+
+                  // 🔹 Total do saldo atual
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                    child: Card(
+                      color: Colors.white,
+                      elevation: 5,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Saldo Atual:',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black54,
+                              ),
+                            ),
+                            Text(
+                              'R\$ ${currentBalance.toStringAsFixed(2).replaceAll('.', ',')}',
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                                color: currentBalance >= 0 ? Colors.green[700] : Colors.red[700],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                );
-              },
+
+                  // Espaço para mover o texto “Transações Recentes”
+                  const SizedBox(height: 20),
+
+                  // 🔹 Título de transações
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                    child: Text(
+                      'Transações Recentes:',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+                    ),
+                  ),
+
+                  // Espaço opcional antes da lista
+                  const SizedBox(height: 10),
+
+                  // 🔹 Lista de transações
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
+                    itemCount: transactions.length,
+                    itemBuilder: (context, index) {
+                      final transaction = transactions[index];
+                      final isExpense = transaction['isExpense'] as bool;
+
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 10),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                        child: ListTile(
+                          leading: Icon(
+                            isExpense ? Icons.arrow_downward : Icons.arrow_upward,
+                            color: isExpense ? Colors.red : Colors.green,
+                          ),
+                          title: Text(transaction['description'].toString()),
+                          subtitle: Text('Data: ${transaction['date']}'),
+                          trailing: Text(
+                            'R\$ ${isExpense ? '-' : ''}${transaction['value'].toStringAsFixed(2).replaceAll('.', ',')}',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: isExpense ? Colors.red : Colors.green,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ],
       ),
-      
-      // 5. Ícone "+" no canto inferior direito, para cadastrar uma transação
+
+      // 🔹 Botão flutuante
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // *** NAVEGAÇÃO PARA A TELA NOVA TRANSAÇÃO ***
-          Navigator.pushNamed(context, MyApp.newTransactionRoute);
+          Navigator.pushNamed(context, '/novaTransacao');
         },
-        backgroundColor: Colors.black, // Cor do botão '+'
-        child: const Icon(Icons.add, color: Colors.white),
+        backgroundColor: Colors.black,
+        child: const Icon(Icons.add, color: Color(0xFF00CED1)),
       ),
     );
   }
 }
+
 
 // ----------------------------------------------------
 // TELA NOVA TRANSAÇÃO (Implementação conforme o fluxo)
