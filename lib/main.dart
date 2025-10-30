@@ -761,7 +761,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                   ),
                   child: const Text(
                     'Salvar Transação',
-                    style: TextStyle(
+                    style: TextStyle( 
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -773,6 +773,6 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
           ),
         ),
       ),
-    );
+    );  //
   }
 }
