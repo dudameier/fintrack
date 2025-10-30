@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
       title: 'Meu Controle de Gastos',
       // Define o tema principal com a cor de fundo vibrante
       theme: ThemeData(
-        // Cor de fundo ciano/turquesa vibrante, baseada na imagem.
+        // Cor de fundo ciano/turquesa vibrante, usada como padrão.
         scaffoldBackgroundColor: const Color.fromRGBO(0, 206, 209, 1),
         // Desativa a sombra padrão para um visual mais clean
         appBarTheme: const AppBarTheme(elevation: 0, color: Colors.transparent),
@@ -444,8 +444,9 @@ class HomePage extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
+                // Redireciona para a tela de Login e remove todas as rotas anteriores
                 Navigator.of(context).pushNamedAndRemoveUntil(
-                  '/login',
+                  MyApp.loginRoute, 
                   (Route<dynamic> route) => false,
                 );
               },
@@ -460,24 +461,23 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // CORRIGIDO: Usando a cor consistente das telas de autenticação
     return Scaffold(
-      // Cor geral da tela
-      backgroundColor: const Color(0xFF00CED1),
+      backgroundColor: const Color.fromRGBO(0, 206, 209, 1),
 
       body: Column(
         children: [
           // ==========================
-          // 🔹 CABEÇALHO SUPERIOR
+          // 🔹 CABEÇALHO SUPERIOR (Usando a cor principal)
           // ==========================
           Container(
             width: double.infinity,
-            color: const Color.fromRGBO(0, 206, 209, 1), // Cor do cabeçalho — altere aqui
+            color: const Color.fromRGBO(0, 206, 209, 1), 
             padding: const EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Espaço para mover o título para cima/baixo
-                const SizedBox(height: 0), // <-- ajuste aqui livremente
+                const SizedBox(height: 0), 
 
                 // 🔹 Linha superior com título e ícone
                 Row(
@@ -505,24 +505,23 @@ class HomePage extends StatelessWidget {
                   ],
                 ),
 
-                // Espaço entre o título e a linha
                 const SizedBox(height: 10),
               ],
             ),
           ),
 
           // ==========================
-          // 🔹 CONTEÚDO INFERIOR
+          // 🔹 CONTEÚDO INFERIOR (Usando a cor principal)
           // ==========================
           Expanded(
             child: Container(
-              color: const Color.fromARGB(212, 113, 250, 254), // 🔹 Cor da parte inferior
+              // CORRIGIDO: Usando a cor principal para consistência
+              color: const Color.fromRGBO(0, 206, 209, 1), 
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Espaço entre cabeçalho e saldo
                   const SizedBox(height: 20),
 
                   // 🔹 Total do saldo atual
@@ -559,7 +558,6 @@ class HomePage extends StatelessWidget {
                     ),
                   ),
 
-                  // Espaço para mover o texto “Transações Recentes”
                   const SizedBox(height: 20),
 
                   // 🔹 Título de transações
@@ -571,39 +569,39 @@ class HomePage extends StatelessWidget {
                     ),
                   ),
 
-                  // Espaço opcional antes da lista
                   const SizedBox(height: 10),
 
                   // 🔹 Lista de transações
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
-                    itemCount: transactions.length,
-                    itemBuilder: (context, index) {
-                      final transaction = transactions[index];
-                      final isExpense = transaction['isExpense'] as bool;
+                  Expanded(
+                    child: ListView.builder(
+                      // shrinkWrap e physics removidos para funcionar corretamente dentro do Expanded
+                      padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
+                      itemCount: transactions.length,
+                      itemBuilder: (context, index) {
+                        final transaction = transactions[index];
+                        final isExpense = transaction['isExpense'] as bool;
 
-                      return Card(
-                        margin: const EdgeInsets.only(bottom: 10),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-                        child: ListTile(
-                          leading: Icon(
-                            isExpense ? Icons.arrow_downward : Icons.arrow_upward,
-                            color: isExpense ? Colors.red : Colors.green,
-                          ),
-                          title: Text(transaction['description'].toString()),
-                          subtitle: Text('Data: ${transaction['date']}'),
-                          trailing: Text(
-                            'R\$ ${isExpense ? '-' : ''}${transaction['value'].toStringAsFixed(2).replaceAll('.', ',')}',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
+                        return Card(
+                          margin: const EdgeInsets.only(bottom: 10),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                          child: ListTile(
+                            leading: Icon(
+                              isExpense ? Icons.arrow_downward : Icons.arrow_upward,
                               color: isExpense ? Colors.red : Colors.green,
                             ),
+                            title: Text(transaction['description'].toString()),
+                            subtitle: Text('Data: ${transaction['date']}'),
+                            trailing: Text(
+                              'R\$ ${isExpense ? '-' : ''}${transaction['value'].toStringAsFixed(2).replaceAll('.', ',')}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: isExpense ? Colors.red : Colors.green,
+                              ),
+                            ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),
@@ -615,7 +613,7 @@ class HomePage extends StatelessWidget {
       // 🔹 Botão flutuante
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, '/novaTransacao');
+          Navigator.pushNamed(context, MyApp.newTransactionRoute); 
         },
         backgroundColor: Colors.black,
         child: const Icon(Icons.add, color: Color(0xFF00CED1)),
@@ -644,6 +642,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
 
   @override
   Widget build(BuildContext context) {
+    // CORRIGIDO: Esta tela já usava a cor correta, mas mantive o ajuste explícito para garantir
     return Scaffold(
       backgroundColor: const Color.fromRGBO(0, 206, 209, 1),
       appBar: AppBar(
