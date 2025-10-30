@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
       title: 'Meu Controle de Gastos',
       // Define o tema principal com a cor de fundo vibrante
       theme: ThemeData(
-        // Cor de fundo ciano/turquesa vibrante, baseada na imagem.
+        // Cor de fundo ciano/turquesa vibrante, usada como padrão.
         scaffoldBackgroundColor: const Color.fromRGBO(0, 206, 209, 1),
         // Desativa a sombra padrão para um visual mais clean
         appBarTheme: const AppBarTheme(elevation: 0, color: Colors.transparent),
@@ -161,7 +161,7 @@ class LoginPage extends StatelessWidget {
               Center(
                 child: TextButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, MyApp.registerRoute);
+                    Navigator.pushNamed(context, MyApp.registerRoute); 
                   },
                   child: const Text(
                     'Criar uma nova conta (Cadastre-se)',
@@ -444,8 +444,9 @@ class HomePage extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
+                // CORRIGIDO: Usando a constante de rota
                 Navigator.of(context).pushNamedAndRemoveUntil(
-                  '/login',
+                  MyApp.loginRoute, 
                   (Route<dynamic> route) => false,
                 );
               },
@@ -461,23 +462,21 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Cor geral da tela
-      backgroundColor: const Color(0xFF00CED1),
+      backgroundColor: const Color.fromRGBO(0, 206, 209, 1),
 
       body: Column(
         children: [
           // ==========================
           // 🔹 CABEÇALHO SUPERIOR
+          // O Scaffold já define a cor de fundo, então o Container não precisa de cor.
           // ==========================
           Container(
             width: double.infinity,
-            color: const Color.fromRGBO(0, 206, 209, 1), // Cor do cabeçalho — altere aqui
             padding: const EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Espaço para mover o título para cima/baixo
-                const SizedBox(height: 0), // <-- ajuste aqui livremente
+                const SizedBox(height: 0), 
 
                 // 🔹 Linha superior com título e ícone
                 Row(
@@ -505,79 +504,70 @@ class HomePage extends StatelessWidget {
                   ],
                 ),
 
-                // Espaço entre o título e a linha
                 const SizedBox(height: 10),
               ],
             ),
           ),
 
           // ==========================
-          // 🔹 CONTEÚDO INFERIOR
+          // 🔹 CONTEÚDO INFERIOR (Resto da tela)
+          // Agora sem Container interno para garantir a cor de fundo única.
           // ==========================
           Expanded(
-            child: Container(
-              color: const Color.fromARGB(212, 113, 250, 254), // 🔹 Cor da parte inferior
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Espaço entre cabeçalho e saldo
-                  const SizedBox(height: 20),
-
-                  // 🔹 Total do saldo atual
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                    child: Card(
-                      color: Colors.white,
-                      elevation: 5,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Saldo Atual:',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black54,
-                              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                
+                // 🔹 Total do saldo atual
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                  child: Card(
+                    color: Colors.white,
+                    elevation: 5,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Saldo Atual:',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black54,
                             ),
-                            Text(
-                              'R\$ ${currentBalance.toStringAsFixed(2).replaceAll('.', ',')}',
-                              style: TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                color: currentBalance >= 0 ? Colors.green[700] : Colors.red[700],
-                              ),
+                          ),
+                          Text(
+                            'R\$ ${currentBalance.toStringAsFixed(2).replaceAll('.', ',')}',
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: currentBalance >= 0 ? Colors.green[700] : Colors.red[700],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
+                ),
 
-                  // Espaço para mover o texto “Transações Recentes”
-                  const SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-                  // 🔹 Título de transações
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                    child: Text(
-                      'Transações Recentes:',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
-                    ),
+                // 🔹 Título de transações
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                  child: Text(
+                    'Transações Recentes:',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
                   ),
+                ),
 
-                  // Espaço opcional antes da lista
-                  const SizedBox(height: 10),
+                const SizedBox(height: 10),
 
-                  // 🔹 Lista de transações
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
+                // 🔹 Lista de transações
+                Expanded(
+                  child: ListView.builder(
                     padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
                     itemCount: transactions.length,
                     itemBuilder: (context, index) {
@@ -605,8 +595,8 @@ class HomePage extends StatelessWidget {
                       );
                     },
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],
@@ -615,7 +605,7 @@ class HomePage extends StatelessWidget {
       // 🔹 Botão flutuante
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, '/novaTransacao');
+          Navigator.pushNamed(context, MyApp.newTransactionRoute); 
         },
         backgroundColor: Colors.black,
         child: const Icon(Icons.add, color: Color(0xFF00CED1)),
