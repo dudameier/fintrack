@@ -418,9 +418,9 @@ class HomePage extends StatelessWidget {
 
   // Lista de transações de exemplo
   final List<Map<String, dynamic>> transactions = const [
-    {'description': 'Salário Mensal', 'value': 4500.00, 'date': '20/10/2025', 'isExpense': false},
-    {'description': 'Conta de Luz', 'value': 150.50, 'date': '21/10/2025', 'isExpense': true},
-    {'description': 'Supermercado', 'value': 320.99, 'date': '21/10/2025', 'isExpense': true},
+    {'description': 'Salário Mensal', 'value': 4500.00, 'date': '21/10/2025', 'isExpense': false},
+    {'description': 'Conta de Luz', 'value': 150.50, 'date': '20/10/2025', 'isExpense': true},
+    {'description': 'Supermercado', 'value': 320.99, 'date': '20/10/2025', 'isExpense': true},
     {'description': 'Venda de Item', 'value': 250.00, 'date': '19/10/2025', 'isExpense': false},
   ];
 
