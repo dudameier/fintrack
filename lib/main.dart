@@ -444,9 +444,8 @@ class HomePage extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                // CORRIGIDO: Usando a constante de rota
                 Navigator.of(context).pushNamedAndRemoveUntil(
-                  MyApp.loginRoute, 
+                  MyApp.loginRoute,
                   (Route<dynamic> route) => false,
                 );
               },
@@ -461,6 +460,16 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 🔹 Agrupar transações por data
+    final Map<String, List<Map<String, dynamic>>> groupedTransactions = {};
+    for (var transaction in transactions) {
+      final date = transaction['date'] as String;
+      if (!groupedTransactions.containsKey(date)) {
+        groupedTransactions[date] = [];
+      }
+      groupedTransactions[date]!.add(transaction);
+    }
+
     return Scaffold(
       backgroundColor: const Color.fromRGBO(0, 206, 209, 1),
 
@@ -468,7 +477,6 @@ class HomePage extends StatelessWidget {
         children: [
           // ==========================
           // 🔹 CABEÇALHO SUPERIOR
-          // O Scaffold já define a cor de fundo, então o Container não precisa de cor.
           // ==========================
           Container(
             width: double.infinity,
@@ -476,48 +484,47 @@ class HomePage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 0), 
-
-                // 🔹 Linha superior com título e ícone
+                const SizedBox(height: 0),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
                       'FinTrack',
                       style: TextStyle(
-                        color: Colors.black,
+                        color: Color.fromRGBO(0, 0, 0, 1),
                         fontWeight: FontWeight.bold,
-                        fontSize: 24,
+                        fontSize: 35,
                       ),
                     ),
                     GestureDetector(
                       onTap: () => _showLogoutDialog(context),
                       child: Container(
-                        padding: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(10),
                         decoration: const BoxDecoration(
                           color: Colors.black12,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.person, color: Colors.black),
+                        child: const Icon(
+                          Icons.person,
+                          color: Colors.black,
+                          size: 30,
+                        ),
                       ),
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 10),
               ],
             ),
           ),
 
           // ==========================
-          // 🔹 CONTEÚDO INFERIOR (Resto da tela)
-          // Agora sem Container interno para garantir a cor de fundo única.
+          // 🔹 CONTEÚDO INFERIOR
           // ==========================
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                
                 // 🔹 Total do saldo atual
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
@@ -535,7 +542,7 @@ class HomePage extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w500,
-                              color: Colors.black54,
+                              color: Color.fromRGBO(0, 0, 0, 1),
                             ),
                           ),
                           Text(
@@ -552,48 +559,55 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 20),
-
-                // 🔹 Título de transações
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                  child: Text(
-                    'Transações Recentes:',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
-                  ),
-                ),
-
                 const SizedBox(height: 10),
 
-                // 🔹 Lista de transações
+                // 🔹 Lista de transações agrupadas por data
                 Expanded(
-                  child: ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
-                    itemCount: transactions.length,
-                    itemBuilder: (context, index) {
-                      final transaction = transactions[index];
-                      final isExpense = transaction['isExpense'] as bool;
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(20.0, 0, 20.0, 16.0),
+                    children: groupedTransactions.entries.map((entry) {
+                      final date = entry.key;
+                      final transactionsForDate = entry.value;
 
-                      return Card(
-                        margin: const EdgeInsets.only(bottom: 10),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-                        child: ListTile(
-                          leading: Icon(
-                            isExpense ? Icons.arrow_downward : Icons.arrow_upward,
-                            color: isExpense ? Colors.red : Colors.green,
-                          ),
-                          title: Text(transaction['description'].toString()),
-                          subtitle: Text('Data: ${transaction['date']}'),
-                          trailing: Text(
-                            'R\$ ${isExpense ? '-' : ''}${transaction['value'].toStringAsFixed(2).replaceAll('.', ',')}',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: isExpense ? Colors.red : Colors.green,
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0, bottom: 6.0, top: 10.0),
+                            child: Text(
+                              'Data: $date',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
                             ),
                           ),
-                        ),
+                          ...transactionsForDate.map((transaction) {
+                            final isExpense = transaction['isExpense'] as bool;
+
+                            return Card(
+                              margin: const EdgeInsets.only(bottom: 10),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                              child: ListTile(
+                                leading: Icon(
+                                  isExpense ? Icons.arrow_downward : Icons.arrow_upward,
+                                  color: isExpense ? Colors.red : Colors.green,
+                                ),
+                                title: Text(transaction['description'].toString()),
+                                trailing: Text(
+                                  'R\$ ${isExpense ? '-' : ''}${transaction['value'].toStringAsFixed(2).replaceAll('.', ',')}',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: isExpense ? Colors.red : Colors.green,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
+                        ],
                       );
-                    },
+                    }).toList(),
                   ),
                 ),
               ],
@@ -605,15 +619,14 @@ class HomePage extends StatelessWidget {
       // 🔹 Botão flutuante
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, MyApp.newTransactionRoute); 
+          Navigator.pushNamed(context, MyApp.newTransactionRoute);
         },
         backgroundColor: Colors.black,
-        child: const Icon(Icons.add, color: Color(0xFF00CED1)),
+        child: const Icon(Icons.add, color: Color.fromRGBO(0, 206, 209, 1)),
       ),
     );
   }
 }
-
 
 // ----------------------------------------------------
 // TELA NOVA TRANSAÇÃO (Implementação conforme o fluxo)
