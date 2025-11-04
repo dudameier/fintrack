@@ -20,7 +20,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Fintrack',
       theme: ThemeData(
-        // Cor de fundo ciano/turquesa vibrante, baseada na imagem.
         scaffoldBackgroundColor: const Color.fromRGBO(0, 206, 209, 1),
         appBarTheme: const AppBarTheme(elevation: 0, color: Colors.transparent),
         useMaterial3: false, 
@@ -425,9 +424,8 @@ class HomePage extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                // Redireciona para a tela de Login e remove todas as rotas anteriores
                 Navigator.of(context).pushNamedAndRemoveUntil(
-                  '/login',
+                  MyApp.loginRoute,
                   (Route<dynamic> route) => false,
                 );
               },
@@ -442,25 +440,28 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Map<String, List<Map<String, dynamic>>> groupedTransactions = {};
+    for (var transaction in transactions) {
+      final date = transaction['date'] as String;
+      if (!groupedTransactions.containsKey(date)) {
+        groupedTransactions[date] = [];
+      }
+      groupedTransactions[date]!.add(transaction);
+    }
+
     return Scaffold(
       backgroundColor: const Color.fromRGBO(0, 206, 209, 1),
 
       body: Column(
         children: [
-          // ==========================
-          // 🔹 CABEÇALHO SUPERIOR
-          // ==========================
+          //cabeçalho superior
           Container(
             width: double.infinity,
-            color: const Color.fromRGBO(0, 206, 209, 1), // Cor do cabeçalho — altere aqui
             padding: const EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Espaço para mover o título para cima/baixo
-                const SizedBox(height: 0), // <-- ajuste aqui livremente
-
-                // 🔹 Linha superior com título e ícone
+                const SizedBox(height: 0),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -489,106 +490,99 @@ class HomePage extends StatelessWidget {
                     ),
                   ],
                 ),
-
-                // Espaço entre o título e a linha
                 const SizedBox(height: 10),
               ],
             ),
           ),
 
-          // ==========================
-          // 🔹 CONTEÚDO INFERIOR
-          // ==========================
+          //conteúdo inferior
           Expanded(
-            child: Container(
-              color: const Color.fromARGB(212, 113, 250, 254), // 🔹 Cor da parte inferior
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Espaço entre cabeçalho e saldo
-                  const SizedBox(height: 20),
-
-                  // 🔹 Total do saldo atual
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                    child: Card(
-                      color: Colors.white,
-                      elevation: 5,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Saldo Atual:',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black54,
-                              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                //total do saldo
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                  child: Card(
+                    color: Colors.white,
+                    elevation: 5,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Saldo Atual:',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                              color: Color.fromRGBO(0, 0, 0, 1),
                             ),
-                            Text(
-                              'R\$ ${currentBalance.toStringAsFixed(2).replaceAll('.', ',')}',
-                              style: TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                color: currentBalance >= 0 ? Colors.green[700] : Colors.red[700],
-                              ),
+                          ),
+                          Text(
+                            'R\$ ${currentBalance.toStringAsFixed(2).replaceAll('.', ',')}',
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: currentBalance >= 0 ? Colors.green[700] : Colors.red[700],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
+                ),
 
-                  // Espaço para mover o texto “Transações Recentes”
-                  const SizedBox(height: 20),
+                const SizedBox(height: 10),
 
-                  // 🔹 Título de transações
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                    child: Text(
-                      'Transações Recentes:',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
-                    ),
-                  ),
+                //lista de transações
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(20.0, 0, 20.0, 16.0),
+                    children: groupedTransactions.entries.map((entry) {
+                      final date = entry.key;
+                      final transactionsForDate = entry.value;
 
-                  // Espaço opcional antes da lista
-                  const SizedBox(height: 10),
-
-                  // 🔹 Lista de transações
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
-                    itemCount: transactions.length,
-                    itemBuilder: (context, index) {
-                      final transaction = transactions[index];
-                      final isExpense = transaction['isExpense'] as bool;
-
-                      return Card(
-                        margin: const EdgeInsets.only(bottom: 10),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-                        child: ListTile(
-                          leading: Icon(
-                            isExpense ? Icons.arrow_downward : Icons.arrow_upward,
-                            color: isExpense ? Colors.red : Colors.green,
-                          ),
-                          title: Text(transaction['description'].toString()),
-                          subtitle: Text('Data: ${transaction['date']}'),
-                          trailing: Text(
-                            'R\$ ${isExpense ? '-' : ''}${transaction['value'].toStringAsFixed(2).replaceAll('.', ',')}',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: isExpense ? Colors.red : Colors.green,
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0, bottom: 6.0, top: 10.0),
+                            child: Text(
+                              'Data: $date',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
                             ),
                           ),
-                        ),
+                          ...transactionsForDate.map((transaction) {
+                            final isExpense = transaction['isExpense'] as bool;
+
+                            return Card(
+                              margin: const EdgeInsets.only(bottom: 10),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                              child: ListTile(
+                                leading: Icon(
+                                  isExpense ? Icons.arrow_downward : Icons.arrow_upward,
+                                  color: isExpense ? Colors.red : Colors.green,
+                                ),
+                                title: Text(transaction['description'].toString()),
+                                trailing: Text(
+                                  'R\$ ${isExpense ? '-' : ''}${transaction['value'].toStringAsFixed(2).replaceAll('.', ',')}',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: isExpense ? Colors.red : Colors.green,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
+                        ],
                       );
-                    },
+                    }).toList(),
                   ),
                 ),
               ],
@@ -600,7 +594,7 @@ class HomePage extends StatelessWidget {
       //botão '+'
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, '/novaTransacao');
+          Navigator.pushNamed(context, MyApp.newTransactionRoute);
         },
         backgroundColor: Colors.black,
         child: const Icon(Icons.add, color: Color.fromRGBO(0, 206, 209, 1)),
@@ -624,7 +618,6 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
 
   @override
   Widget build(BuildContext context) {
-    // CORRIGIDO: Esta tela já usava a cor correta, mas mantive o ajuste explícito para garantir
     return Scaffold(
       backgroundColor: const Color.fromRGBO(0, 206, 209, 1),
       appBar: AppBar(
