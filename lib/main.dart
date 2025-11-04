@@ -1,54 +1,48 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  // Inicializa o aplicativo Flutter
   runApp(const MyApp());
 }
 
-// Classe principal do aplicativo
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // Define as rotas nomeadas para a navegação
+  //rotas
   static const String loginRoute = '/';
   static const String registerRoute = '/register';
   static const String forgotPasswordRoute = '/forgot-password';
-  static const String homeRoute = '/home'; // Para a tela principal
-  static const String newTransactionRoute = '/new-transaction'; // Para a tela de nova transação
+  static const String homeRoute = '/home';
+  static const String newTransactionRoute = '/new-transaction';
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Meu Controle de Gastos',
-      // Define o tema principal com a cor de fundo vibrante
+      debugShowCheckedModeBanner: false,
+      title: 'Fintrack',
       theme: ThemeData(
-        // Cor de fundo ciano/turquesa vibrante, usada como padrão.
         scaffoldBackgroundColor: const Color.fromRGBO(0, 206, 209, 1),
-        // Desativa a sombra padrão para um visual mais clean
         appBarTheme: const AppBarTheme(elevation: 0, color: Colors.transparent),
         useMaterial3: false, 
       ),
-      // Define as rotas do aplicativo
+      //fim das rotas
       initialRoute: loginRoute,
       routes: {
         loginRoute: (context) => const LoginPage(),
         registerRoute: (context) => const RegisterPage(),
         forgotPasswordRoute: (context) => const ForgotPasswordPage(),
         homeRoute: (context) => const HomePage(), 
-        newTransactionRoute: (context) => const NewTransactionPage(), // TELA DE NOVA TRANSAÇÃO ATIVA
+        newTransactionRoute: (context) => const NewTransactionPage(),
       },
     );
   }
 }
 
-// FUNÇÃO UTILITÁRIA DE ESTILOS (Campo de texto)
 InputDecoration _inputDecoration(String label) {
   return InputDecoration(
     labelText: label,
     labelStyle: const TextStyle(color: Colors.black54),
     filled: true,
-    fillColor: Colors.white, // Fundo branco do campo
-    // Borda arredondada e sem linha visível
+    fillColor: Colors.white,
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12.0),
       borderSide: BorderSide.none,
@@ -57,7 +51,6 @@ InputDecoration _inputDecoration(String label) {
       borderRadius: BorderRadius.circular(12.0),
       borderSide: BorderSide.none,
     ),
-    // Borda preta levemente mais grossa quando focado
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12.0),
       borderSide: const BorderSide(color: Colors.black, width: 2.0),
@@ -66,9 +59,7 @@ InputDecoration _inputDecoration(String label) {
   );
 }
 
-// ----------------------------------------------------
 // TELA LOGIN
-// ----------------------------------------------------
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
@@ -82,7 +73,7 @@ class LoginPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              // 1. Nome do App
+              
               const SizedBox(height: 135),
               Center(
                 child: Text(
@@ -97,8 +88,6 @@ class LoginPage extends StatelessWidget {
               ),
               const SizedBox(height: 65),
 
-
-              // Título "Login"
               const Text(
                 'Login',
                 style: TextStyle(
@@ -109,7 +98,7 @@ class LoginPage extends StatelessWidget {
               ),
               const SizedBox(height: 25),
 
-              // 2. Campo - E-mail
+              //email
               TextFormField(
                 keyboardType: TextInputType.emailAddress,
                 decoration: _inputDecoration('E-mail'),
@@ -117,7 +106,7 @@ class LoginPage extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              // 3. Campo Senha
+              //senha
               TextFormField(
                 obscureText: true,
                 decoration: _inputDecoration('Senha'),
@@ -125,12 +114,11 @@ class LoginPage extends StatelessWidget {
               ),
               const SizedBox(height: 40),
 
-              // 4. Botão de entrar (Principal)
+              //entrar
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    // NAVEGAÇÃO PARA A TELA PRINCIPAL
                     Navigator.pushNamedAndRemoveUntil(
                       context, 
                       MyApp.homeRoute, 
@@ -157,7 +145,7 @@ class LoginPage extends StatelessWidget {
               ),
               const SizedBox(height: 30),
 
-              // 5. Botão de cadastro
+              //cadastro
               Center(
                 child: TextButton(
                   onPressed: () {
@@ -175,7 +163,7 @@ class LoginPage extends StatelessWidget {
               ),
               const SizedBox(height: 5),
 
-              // 6. Botão de esquecimento de senha
+              //esqueceu sua senha
               Center(
                 child: TextButton(
                   onPressed: () {
@@ -199,9 +187,7 @@ class LoginPage extends StatelessWidget {
   }
 }
 
-// ----------------------------------------------------
 // TELA CADASTRO
-// ----------------------------------------------------
 class RegisterPage extends StatelessWidget {
   const RegisterPage({super.key});
 
@@ -229,7 +215,7 @@ class RegisterPage extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              // 2. Campo - E-mail
+              //email
               TextFormField(
                 keyboardType: TextInputType.emailAddress,
                 decoration: _inputDecoration('E-mail'),
@@ -237,7 +223,7 @@ class RegisterPage extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              // 3. Campo Senha
+              //senha
               TextFormField(
                 obscureText: true,
                 decoration: _inputDecoration('Senha'),
@@ -252,7 +238,7 @@ class RegisterPage extends StatelessWidget {
               ),
               const SizedBox(height: 40),
 
-              // 4. Botão de cadastrar
+              //cadastrar
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -282,7 +268,7 @@ class RegisterPage extends StatelessWidget {
               ),
               const SizedBox(height: 30),
 
-              // 5. Descrição perguntando se já tem cadastro, que leva à aba de login
+              //já tem cadastro
               Center(
                 child: TextButton(
                   onPressed: () {
@@ -306,9 +292,7 @@ class RegisterPage extends StatelessWidget {
   }
 }
 
-// ----------------------------------------------------
 // TELA ESQUECEU SENHA
-// ----------------------------------------------------
 class ForgotPasswordPage extends StatelessWidget {
   const ForgotPasswordPage({super.key});
 
@@ -317,7 +301,7 @@ class ForgotPasswordPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color.fromRGBO(0, 206, 209, 1),
       appBar: AppBar(
-        // Inclui a flecha para voltar (4. flecha para voltar)
+        //flecha pra voltar
         iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: SafeArea(
@@ -337,7 +321,6 @@ class ForgotPasswordPage extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               
-              // 5. Descrição orientando para inserir email
               const Text(
                 'Para redefinir sua senha, digite o e-mail cadastrado abaixo. Enviaremos um link de recuperação.',
                 style: TextStyle(
@@ -347,7 +330,7 @@ class ForgotPasswordPage extends StatelessWidget {
               ),
               const SizedBox(height: 40),
 
-              // 1. Campo Email
+              //email
               TextFormField(
                 keyboardType: TextInputType.emailAddress,
                 decoration: _inputDecoration('E-mail'),
@@ -355,7 +338,7 @@ class ForgotPasswordPage extends StatelessWidget {
               ),
               const SizedBox(height: 40),
 
-              // 2. Botão de recuperar senha
+              //recuperar senha
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -385,7 +368,7 @@ class ForgotPasswordPage extends StatelessWidget {
               ),
               const SizedBox(height: 30),
 
-              // 3. Escrita de logar se lembrou da senha
+              //logar
               Center(
                 child: TextButton(
                   onPressed: () {
@@ -409,14 +392,11 @@ class ForgotPasswordPage extends StatelessWidget {
   }
 }
 
-
-// ----------------------------------------------------
 // TELA PRINCIPAL
-// ----------------------------------------------------
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
-  // Lista de transações de exemplo
+  //transações
   final List<Map<String, dynamic>> transactions = const [
     {'description': 'Salário Mensal', 'value': 4500.00, 'date': '21/10/2025', 'isExpense': false},
     {'description': 'Conta de Luz', 'value': 150.50, 'date': '20/10/2025', 'isExpense': true},
@@ -460,7 +440,6 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 🔹 Agrupar transações por data
     final Map<String, List<Map<String, dynamic>>> groupedTransactions = {};
     for (var transaction in transactions) {
       final date = transaction['date'] as String;
@@ -475,9 +454,7 @@ class HomePage extends StatelessWidget {
 
       body: Column(
         children: [
-          // ==========================
-          // 🔹 CABEÇALHO SUPERIOR
-          // ==========================
+          //cabeçalho superior
           Container(
             width: double.infinity,
             padding: const EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 10),
@@ -518,14 +495,12 @@ class HomePage extends StatelessWidget {
             ),
           ),
 
-          // ==========================
-          // 🔹 CONTEÚDO INFERIOR
-          // ==========================
+          //conteúdo inferior
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 🔹 Total do saldo atual
+                //total do saldo
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
                   child: Card(
@@ -561,7 +536,7 @@ class HomePage extends StatelessWidget {
 
                 const SizedBox(height: 10),
 
-                // 🔹 Lista de transações agrupadas por data
+                //lista de transações
                 Expanded(
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(20.0, 0, 20.0, 16.0),
@@ -616,7 +591,7 @@ class HomePage extends StatelessWidget {
         ],
       ),
 
-      // 🔹 Botão flutuante
+      //botão '+'
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.pushNamed(context, MyApp.newTransactionRoute);
@@ -628,9 +603,7 @@ class HomePage extends StatelessWidget {
   }
 }
 
-// ----------------------------------------------------
-// TELA NOVA TRANSAÇÃO (Implementação conforme o fluxo)
-// ----------------------------------------------------
+// TELA NOVA TRANSAÇÃO
 class NewTransactionPage extends StatefulWidget {
   const NewTransactionPage({super.key});
 
@@ -638,11 +611,9 @@ class NewTransactionPage extends StatefulWidget {
   State<NewTransactionPage> createState() => _NewTransactionPageState();
 }
 
-// Enum para representar o tipo de transação
 enum TransactionType { entrada, saida }
 
 class _NewTransactionPageState extends State<NewTransactionPage> {
-  // Estado para controlar o tipo de transação selecionado (4. e 5.)
   TransactionType _selectedType = TransactionType.saida; 
 
   @override
@@ -650,10 +621,10 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     return Scaffold(
       backgroundColor: const Color.fromRGBO(0, 206, 209, 1),
       appBar: AppBar(
-        // 7. Flecha canto superior esquerdo para voltar a tela principal
+        //flecha pra voltar
         iconTheme: const IconThemeData(color: Colors.black),
         title: const Text(
-          'Nova Transação', // 1. Título
+          'Nova Transação',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
@@ -664,7 +635,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              // 2. Campo Descrição
+              //descrição
               const SizedBox(height: 20),
               TextFormField(
                 decoration: _inputDecoration('Descrição da Transação'),
@@ -672,7 +643,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
               ),
               const SizedBox(height: 20),
 
-              // 3. Campo Valor
+              //valor
               TextFormField(
                 keyboardType: TextInputType.number,
                 decoration: _inputDecoration('Valor (R\$)'),
@@ -686,7 +657,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
               ),
               const SizedBox(height: 10),
 
-              // 4. Campo Tipo Entrada / 5. Campo Tipo Saída (Usando botões segmentados)
+              //botão entrada/saída
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -744,12 +715,11 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
 
               const SizedBox(height: 40),
 
-              // 6. Botão Salvar
+              //salvar
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    // Simula a adição da transação e volta para a Home
                     Navigator.pop(context); 
                     ScaffoldMessenger.of(context).showSnackBar(
                        const SnackBar(content: Text('Simulando Transação Salva!')),
