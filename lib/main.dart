@@ -1,8 +1,23 @@
+// Garanta que estes imports estejam no topo do seu main.dart
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'package:fintrack/services/auth_service.dart';
+import 'package:fintrack/services/transaction_service.dart'; // <-- NOVO IMPORT
+// Importações do Firestore, se não estiverem aqui, coloque:
+import 'package:cloud_firestore/cloud_firestore.dart'; 
+// ...
 
-void main() {
+
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -60,8 +75,56 @@ InputDecoration _inputDecoration(String label) {
 }
 
 // TELA LOGIN
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  // Controladores e Serviço
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final AuthService _authService = AuthService();
+  bool _isLoading = false;
+
+  Future<void> _signIn() async {
+    setState(() { _isLoading = true; });
+
+    try {
+      // CHAMADA REAL DE LOGIN
+      await _authService.signIn(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      // SUCESSO: Redireciona para a home
+      if (mounted) {
+        Navigator.pushNamedAndRemoveUntil(
+          context, 
+          MyApp.homeRoute, 
+          (Route<dynamic> route) => false,
+        );
+      }
+    } catch (error) {
+      // ERRO: Exibe a mensagem de erro do AuthService
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error.toString())),
+        );
+      }
+    } finally {
+      setState(() { _isLoading = false; });
+    }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -98,33 +161,29 @@ class LoginPage extends StatelessWidget {
               ),
               const SizedBox(height: 25),
 
-              //email
+              // email (LIGAR CONTROLLER)
               TextFormField(
+                controller: _emailController, 
                 keyboardType: TextInputType.emailAddress,
                 decoration: _inputDecoration('E-mail'),
                 style: const TextStyle(color: Colors.black),
               ),
               const SizedBox(height: 20),
 
-              //senha
+              // senha (LIGAR CONTROLLER)
               TextFormField(
+                controller: _passwordController, 
                 obscureText: true,
                 decoration: _inputDecoration('Senha'),
                 style: const TextStyle(color: Colors.black),
               ),
               const SizedBox(height: 40),
 
-              //entrar
+              // entrar (LIGAR A FUNÇÃO DE LOGIN)
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushNamedAndRemoveUntil(
-                      context, 
-                      MyApp.homeRoute, 
-                      (Route<dynamic> route) => false,
-                    );
-                  },
+                  onPressed: _isLoading ? null : _signIn, 
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black,
                     padding: const EdgeInsets.symmetric(vertical: 15.0),
@@ -133,19 +192,25 @@ class LoginPage extends StatelessWidget {
                     ),
                     elevation: 5,
                   ),
-                  child: const Text(
-                    'Entrar',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
+                  child: _isLoading 
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        )
+                      : const Text(
+                          'Entrar',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                 ),
               ),
               const SizedBox(height: 30),
 
-              //cadastro
+              // cadastro
               Center(
                 child: TextButton(
                   onPressed: () {
@@ -163,7 +228,7 @@ class LoginPage extends StatelessWidget {
               ),
               const SizedBox(height: 5),
 
-              //esqueceu sua senha
+              // esqueceu sua senha
               Center(
                 child: TextButton(
                   onPressed: () {
@@ -614,19 +679,70 @@ class NewTransactionPage extends StatefulWidget {
 enum TransactionType { entrada, saida }
 
 class _NewTransactionPageState extends State<NewTransactionPage> {
-  TransactionType _selectedType = TransactionType.saida; 
+  TransactionType _selectedType = TransactionType.saida;
+  
+  // Controladores e Serviço
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _valueController = TextEditingController();
+  final TransactionService _transactionService = TransactionService(); // CHAMA O SERVIÇO
+  bool _isLoading = false;
+
+  Future<void> _saveTransaction() async {
+    // Lógica de captura e validação
+    final description = _descriptionController.text.trim();
+    final value = double.tryParse(_valueController.text.replaceAll(',', '.')) ?? 0.0;
+    final isExpense = _selectedType == TransactionType.saida;
+
+    if (description.isEmpty || value <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Preencha a descrição e o valor corretamente.')),
+      );
+      return;
+    }
+
+    setState(() { _isLoading = true; });
+
+    try {
+      // *************** AÇÃO CRÍTICA: SALVAR NO FIRESTORE ***************
+      await _transactionService.addTransaction(
+        description: description,
+        value: value,
+        isExpense: isExpense,
+      );
+      // *****************************************************************
+
+      // SUCESSO: Volta para a Home
+      if (mounted) {
+        Navigator.pop(context); 
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Transação Salva com Sucesso!')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao salvar transação: $e')),
+        );
+      }
+    } finally {
+      setState(() { _isLoading = false; });
+    }
+  }
+
+  @override
+  void dispose() {
+    _descriptionController.dispose();
+    _valueController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromRGBO(0, 206, 209, 1),
       appBar: AppBar(
-        //flecha pra voltar
         iconTheme: const IconThemeData(color: Colors.black),
-        title: const Text(
-          'Nova Transação',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-        ),
+        title: const Text('Nova Transação', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         centerTitle: true,
       ),
       body: SafeArea(
@@ -635,16 +751,18 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              //descrição
+              // descrição
               const SizedBox(height: 20),
               TextFormField(
+                controller: _descriptionController, // <-- LIGADO
                 decoration: _inputDecoration('Descrição da Transação'),
                 style: const TextStyle(color: Colors.black),
               ),
               const SizedBox(height: 20),
 
-              //valor
+              // valor
               TextFormField(
+                controller: _valueController, // <-- LIGADO
                 keyboardType: TextInputType.number,
                 decoration: _inputDecoration('Valor (R\$)'),
                 style: const TextStyle(color: Colors.black),
@@ -657,7 +775,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
               ),
               const SizedBox(height: 10),
 
-              //botão entrada/saída
+              // botões entrada/saída (mantidos)
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -669,11 +787,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                   children: [
                     Expanded(
                       child: TextButton(
-                        onPressed: () {
-                          setState(() {
-                            _selectedType = TransactionType.entrada;
-                          });
-                        },
+                        onPressed: () { setState(() { _selectedType = TransactionType.entrada; }); },
                         style: TextButton.styleFrom(
                           backgroundColor: _selectedType == TransactionType.entrada ? Colors.green.shade100 : Colors.transparent,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
@@ -690,11 +804,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                     ),
                     Expanded(
                       child: TextButton(
-                        onPressed: () {
-                          setState(() {
-                            _selectedType = TransactionType.saida;
-                          });
-                        },
+                        onPressed: () { setState(() { _selectedType = TransactionType.saida; }); },
                         style: TextButton.styleFrom(
                           backgroundColor: _selectedType == TransactionType.saida ? Colors.red.shade100 : Colors.transparent,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
@@ -715,16 +825,11 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
 
               const SizedBox(height: 40),
 
-              //salvar
+              // salvar (LIGAR FUNÇÃO DE SALVAR REAL)
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context); 
-                    ScaffoldMessenger.of(context).showSnackBar(
-                       const SnackBar(content: Text('Simulando Transação Salva!')),
-                    );
-                  },
+                  onPressed: _isLoading ? null : _saveTransaction, // <-- CHAMA FUNÇÃO REAL
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black,
                     padding: const EdgeInsets.symmetric(vertical: 15.0),
@@ -733,14 +838,20 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                     ),
                     elevation: 5,
                   ),
-                  child: const Text(
-                    'Salvar Transação',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
+                  child: _isLoading 
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                      )
+                    : const Text(
+                        'Salvar Transação',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
                 ),
               ),
             ],
